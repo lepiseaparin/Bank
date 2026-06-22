@@ -1,0 +1,28 @@
+from typing import Optional
+from src.main.api.senior.configs.config import Config
+from src.main.api.senior.foundation.http_requester import HTTPRequester
+from src.main.api.senior.foundation.requesters.crud_requester import CrudRequester
+from src.main.api.senior.models.base_model import BaseModel
+import allure
+
+
+class ValidateCrudRequester(HTTPRequester):
+    def __init__(self, request_spec, endpoint, response_spec):
+        super().__init__(request_spec,endpoint,response_spec)
+        self.crud_requester = CrudRequester(
+            request_spec=request_spec,
+            endpoint=endpoint,
+            response_spec=response_spec
+        )
+
+    def post(self, model: Optional[BaseModel] = None) -> BaseModel:
+        response = self.crud_requester.post(model)
+        with allure.step(f"POST {Config.fetch("backendUrl")}{self.endpoint.value.url} and Validated model"):
+            allure.attach(f"Validated model response: {self.endpoint.value.response_model.__name__}")
+        self.response_spec(response)
+        return self.endpoint.value.response_model.validate(response.json())
+
+    def delete(self, user_id: int):
+        response = self.crud_requester.delete(user_id)
+        self.response_spec(response)
+        return self.endpoint.value.response_model.validate(response.json())
