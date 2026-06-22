@@ -28,4 +28,4 @@ class TestCreateAccount:
         response_user = api_manager.user_steps.create_invalid_accounts(create_user_request)
         user_account_from_db = Account.get_account_by_id(db_session, response_user)
 
-        assert user_account_from_db is None, "Ошибка. Аккаунт создан" # не думаю, что так правильно
+        assert user_account_from_db is None, "Ошибка. Аккаунт создан" # не думаю, что так правильно.
